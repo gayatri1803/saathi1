@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Settings, Eye, ZoomIn } from 'lucide-react';
+import { Settings, Eye, ZoomIn, Brain } from 'lucide-react';
 import './AccessibilitySelector.css';
 
 const AccessibilitySelector = ({ onSelect }) => {
@@ -17,6 +17,12 @@ const AccessibilitySelector = ({ onSelect }) => {
             title: 'Simplified Mode',
             description: 'Cognitive layout: large icons, minimal text, one action per screen.',
             icon: <ZoomIn size={48} />,
+        },
+        {
+            id: 'cognitive',
+            title: 'Cognitive Mode',
+            description: 'Plain language layout: massive text, simplest terms, zero clutter.',
+            icon: <Brain size={48} />,
         },
         {
             id: 'high-contrast',

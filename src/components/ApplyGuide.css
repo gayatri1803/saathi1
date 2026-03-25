@@ -536,3 +536,124 @@
 .simplified-layout .ag-nav-actions {
     flex-direction: column-reverse;
 }
+
+/* Document Guide Modal */
+.ag-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+}
+
+.theme-high-contrast .ag-modal-overlay {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.ag-modal-content {
+    background: var(--bg-color);
+    border-radius: var(--border-radius);
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+}
+
+.theme-high-contrast .ag-modal-content {
+    border: 3px solid white;
+}
+
+.ag-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.theme-high-contrast .ag-modal-header {
+    border-bottom: 2px solid white;
+}
+
+.ag-modal-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: var(--text-main);
+}
+
+.theme-high-contrast .ag-modal-header h3 {
+    color: white;
+}
+
+.ag-modal-body {
+    padding: 1.5rem;
+}
+
+.ag-guide-section {
+    margin-bottom: 1.25rem;
+}
+
+.ag-guide-section h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1rem;
+    color: var(--text-muted);
+}
+
+.theme-high-contrast .ag-guide-section h4 {
+    color: white;
+}
+
+.ag-guide-section p {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--text-main);
+    font-weight: 500;
+}
+
+.theme-high-contrast .ag-guide-section p {
+    color: white;
+}
+
+.ag-guide-steps {
+    margin: 0;
+    padding-left: 1.5rem;
+    color: var(--text-main);
+    font-size: 1.1rem;
+}
+
+.theme-high-contrast .ag-guide-steps {
+    color: white;
+}
+
+.ag-guide-steps li {
+    margin-bottom: 0.5rem;
+}
+
+.ag-time-estimate {
+    display: inline-block;
+    background: rgba(55, 138, 221, 0.1);
+    color: var(--primary-teal);
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-weight: 600;
+}
+
+.theme-high-contrast .ag-time-estimate {
+    background: transparent;
+    border: 1px solid white;
+    color: white;
+}
+
+/* Misc Tweaks */
+.ag-upload-card-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}

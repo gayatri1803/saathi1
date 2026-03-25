@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, Volume2, Upload, Camera, FileText, CheckCircle, Lightbulb, Trash2, Mic } from 'lucide-react';
+import { ArrowLeft, Volume2, Upload, Camera, FileText, CheckCircle, Lightbulb, Trash2, Mic, AlertCircle, X } from 'lucide-react';
 import './ApplyGuide.css';
 
 const MOCK_SCHEME_NAME = "Scholarship for Top Class Education";
@@ -15,7 +15,7 @@ const ApplyGuide = ({ theme, onBack, onNavigate }) => {
     }, []);
 
     const [currentStep, setCurrentStep] = useState(1);
-    const totalSteps = 4; // Not counting success screen
+    const totalSteps = 5; // Not counting success screen
 
     // Document states
     const [documents, setDocuments] = useState({
@@ -23,6 +23,26 @@ const ApplyGuide = ({ theme, onBack, onNavigate }) => {
         certificate: null,
         income: null
     });
+
+    const [activeDocGuide, setActiveDocGuide] = useState(null);
+
+    const DOC_GUIDES = {
+        aadhaar: {
+            where: "Nearest Aadhaar Seva Kendra or apply online",
+            steps: ["Visit booking.uidai.gov.in", "Book an appointment", "Visit center with proof of identity and address"],
+            time: "10-15 working days"
+        },
+        certificate: {
+            where: "Nearest Government Hospital / CMO Office",
+            steps: ["Visit hospital with 2 passport photos", "Undergo medical examination", "Collect certificate"],
+            time: "7-14 working days"
+        },
+        income: {
+            where: "Nearest Tehsil Office or e-District Portal",
+            steps: ["Visit local Tehsildar office", "Submit Aadhaar & Affidavit", "Complete verification process"],
+            time: "3-5 working days"
+        }
+    };
 
     const handleReadAloud = (text) => {
         alert(`Reading aloud: ${text}`);
@@ -56,7 +76,7 @@ const ApplyGuide = ({ theme, onBack, onNavigate }) => {
     const allUploaded = documents.aadhaar && documents.certificate && documents.income;
 
     const handleNext = () => {
-        if (currentStep < 5) setCurrentStep(prev => prev + 1);
+        if (currentStep < 6) setCurrentStep(prev => prev + 1);
     };
 
     const handleBack = () => {
@@ -155,13 +175,20 @@ const ApplyGuide = ({ theme, onBack, onNavigate }) => {
                                         </button>
                                     </div>
                                 ) : (
-                                    <div className="ag-upload-actions">
-                                        <button className="btn btn-outline small-btn" onClick={() => triggerUpload(doc.id)}>
-                                            <Upload size={16} /> Upload
-                                        </button>
-                                        <button className="btn btn-outline small-btn" onClick={() => triggerUpload(doc.id)}>
-                                            <Camera size={16} /> Camera
-                                        </button>
+                                    <div className="ag-upload-card-actions">
+                                        <div className="ag-upload-actions">
+                                            <button className="btn btn-outline small-btn" onClick={() => triggerUpload(doc.id)}>
+                                                <Upload size={16} /> Upload
+                                            </button>
+                                            <button className="btn btn-outline small-btn" onClick={() => triggerUpload(doc.id)}>
+                                                <Camera size={16} /> Camera
+                                            </button>
+                                        </div>
+                                        <div style={{ marginTop: '8px' }}>
+                                            <button className="btn-text-only" style={{ color: 'var(--primary-color)', textDecoration: 'underline', fontSize: '0.9rem', padding: '4px 0', border: 'none', background: 'none', cursor: 'pointer', fontFamily: 'inherit' }} onClick={() => setActiveDocGuide(doc.id)}>
+                                                How to get this?
+                                            </button>
+                                        </div>
                                     </div>
                                 )}
                             </div>
@@ -180,11 +207,94 @@ const ApplyGuide = ({ theme, onBack, onNavigate }) => {
         }
 
         if (currentStep === 4) {
-            const stepText = "Review your application summary below. Ensure all uploaded documents are correct before submitting to the Government Portal.";
+            const uploadedCount = Object.values(documents).filter(Boolean).length;
+            const successProbability = uploadedCount === 3 ? 95 : uploadedCount === 2 ? 62 : 30;
+            const riskLevel = uploadedCount === 3 ? 'Low' : uploadedCount === 2 ? 'Medium' : 'High';
+            const riskColor = uploadedCount === 3 ? '#166534' : uploadedCount === 2 ? '#b45309' : '#b91c1c';
+
+            const missingDocsKeys = Object.keys(documents).filter(k => !documents[k]);
+            const issues = missingDocsKeys.map(k => {
+                if (k === 'aadhaar') return "Aadhaar Card Missing";
+                if (k === 'certificate') return "Disability Certificate Missing";
+                if (k === 'income') return "Income Proof Missing";
+                return "";
+            });
+
+            const fixes = missingDocsKeys.map(k => {
+                if (k === 'aadhaar') return "Upload front and back of Aadhaar";
+                if (k === 'certificate') return "Ensure disability certificate is government-issued and upload it";
+                if (k === 'income') return "Upload a valid income certificate";
+                return "";
+            });
+
+            const stepText = `Your application readiness score is ${successProbability}%. Please review the issues detected before final submission.`;
+
             return (
                 <div className="ag-step-card fade-in">
                     <div className="ag-step-header">
                         <div className="ag-step-circle">4</div>
+                        <h2>Application Readiness Analysis</h2>
+                        <button className="read-aloud-btn circle" onClick={() => handleReadAloud(stepText)} aria-label="Read step aloud">
+                            <Volume2 size={24} />
+                        </button>
+                    </div>
+
+                    <div className="readiness-score-card" style={{ textAlign: 'center', padding: '1.5rem', background: 'var(--surface-color)', borderRadius: '12px', marginBottom: '1.5rem', border: `2px solid ${riskColor}33` }}>
+                        <div style={{ fontSize: '3rem', fontWeight: 'bold', color: riskColor }}>
+                            {successProbability}%
+                        </div>
+                        <div style={{ fontSize: '1.1rem', color: 'var(--text-secondary)' }}>Success Probability</div>
+                        <div style={{ marginTop: '0.5rem', display: 'inline-block', padding: '4px 12px', borderRadius: '16px', backgroundColor: `${riskColor}15`, color: riskColor, fontWeight: 'bold' }}>
+                            {riskLevel} Risk
+                        </div>
+                    </div>
+
+                    {issues.length > 0 ? (
+                        <>
+                            <div className="issues-section" style={{ marginBottom: '1.5rem', padding: '1rem', backgroundColor: '#fef2f2', borderRadius: '8px', borderLeft: '4px solid #b91c1c' }}>
+                                <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#b91c1c', marginTop: 0, marginBottom: '8px' }}>
+                                    <AlertCircle size={20} /> Issues Detected
+                                </h4>
+                                <ul style={{ paddingLeft: '24px', color: '#7f1d1d', margin: 0 }}>
+                                    {issues.map((iss, i) => <li key={i}>{iss}</li>)}
+                                    {uploadedCount > 0 && <li>Disability Certificate may be invalid format</li>}
+                                </ul>
+                            </div>
+
+                            <div className="fixes-section" style={{ marginBottom: '1.5rem', padding: '1rem', backgroundColor: '#f0fdf4', borderRadius: '8px', borderLeft: '4px solid #166534' }}>
+                                <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#166534', marginTop: 0, marginBottom: '8px' }}>
+                                    <CheckCircle size={20} /> How to Fix
+                                </h4>
+                                <ul style={{ paddingLeft: '24px', color: '#14532d', margin: 0 }}>
+                                    {fixes.map((fix, i) => <li key={i}>{fix}</li>)}
+                                    {uploadedCount > 0 && <li>Ensure Disability Certificate is readable</li>}
+                                </ul>
+                            </div>
+
+                            <div className="ag-tip-box" style={{ backgroundColor: '#eff6ff', borderLeftColor: '#1d4ed8' }}>
+                                <Lightbulb size={24} className="tip-icon" style={{ color: '#1d4ed8' }} />
+                                <p><strong>Improve your chances to 95%</strong> by fixing the above issues.</p>
+                            </div>
+                        </>
+                    ) : (
+                        <div className="ag-success-banner" style={{ marginTop: '1rem' }}>
+                            <CheckCircle size={24} />
+                            <div>
+                                <strong>Excellent Readiness!</strong>
+                                <p style={{ margin: 0, fontSize: '0.9rem' }}>No issues detected. You are ready to submit.</p>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        if (currentStep === 5) {
+            const stepText = "Review your application summary below. Ensure all uploaded documents are correct before submitting to the Government Portal.";
+            return (
+                <div className="ag-step-card fade-in">
+                    <div className="ag-step-header">
+                        <div className="ag-step-circle">5</div>
                         <h2>Final Review</h2>
                         <button className="read-aloud-btn circle" onClick={() => handleReadAloud(stepText)} aria-label="Read step aloud">
                             <Volume2 size={24} />
@@ -211,7 +321,7 @@ const ApplyGuide = ({ theme, onBack, onNavigate }) => {
             );
         }
 
-        if (currentStep === 5) {
+        if (currentStep === 6) {
             return (
                 <div className="ag-success-screen fade-in">
                     <div className="success-anim">
@@ -233,7 +343,7 @@ const ApplyGuide = ({ theme, onBack, onNavigate }) => {
         }
     };
 
-    if (currentStep === 5) {
+    if (currentStep === 6) {
         return (
             <div className="apply-guide-page">
                 <div className="ag-container">
@@ -273,10 +383,15 @@ const ApplyGuide = ({ theme, onBack, onNavigate }) => {
 
                 {/* Footer Actions */}
                 <footer className={`ag-footer ${isSimplified ? 'simplified-layout' : ''}`}>
-                    {currentStep === 4 ? (
+                    {currentStep === 5 ? (
                         <div className="ag-submit-actions">
                             <button className="btn btn-outline full-width" onClick={handleBack}>Save and continue later</button>
                             <button className="btn btn-primary full-width" onClick={handleNext}>Submit application</button>
+                        </div>
+                    ) : currentStep === 4 ? (
+                        <div className="ag-submit-actions" style={{ flexDirection: isSimplified ? 'column' : 'row', gap: '1rem', display: 'flex' }}>
+                            <button className="btn btn-outline full-width" onClick={() => setCurrentStep(3)}>Fix Issues</button>
+                            <button className="btn btn-primary full-width" onClick={() => setCurrentStep(5)}>Proceed Anyway</button>
                         </div>
                     ) : (
                         <div className="ag-nav-actions">
@@ -291,6 +406,39 @@ const ApplyGuide = ({ theme, onBack, onNavigate }) => {
                 </footer>
 
             </div>
+
+            {/* Document Guide Modal */}
+            {activeDocGuide && (
+                <div className="ag-modal-overlay" onClick={() => setActiveDocGuide(null)}>
+                    <div className="ag-modal-content" onClick={e => e.stopPropagation()}>
+                        <div className="ag-modal-header">
+                            <h3>Document Guide</h3>
+                            <button className="icon-btn" onClick={() => setActiveDocGuide(null)} aria-label="Close modal"><X size={24} /></button>
+                        </div>
+                        <div className="ag-modal-body">
+                            <div className="ag-guide-section">
+                                <h4>Where to go:</h4>
+                                <p>{DOC_GUIDES[activeDocGuide].where}</p>
+                            </div>
+                            <div className="ag-guide-section">
+                                <h4>Steps:</h4>
+                                <ol className="ag-guide-steps">
+                                    {DOC_GUIDES[activeDocGuide].steps.map((step, i) => (
+                                        <li key={i}>{step}</li>
+                                    ))}
+                                </ol>
+                            </div>
+                            <div className="ag-guide-section">
+                                <h4>Time estimate:</h4>
+                                <p className="ag-time-estimate">{DOC_GUIDES[activeDocGuide].time}</p>
+                            </div>
+                            <button className="btn btn-primary full-width" style={{ marginTop: '1.5rem' }} onClick={() => setActiveDocGuide(null)}>
+                                Got it
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

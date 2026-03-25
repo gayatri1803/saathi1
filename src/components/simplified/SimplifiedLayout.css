@@ -1,0 +1,113 @@
+/* src/components/simplified/SimplifiedLayout.css */
+
+.theme-simplified,
+.theme-cognitive {
+    --bg-color: #FFFFFF;
+    --primary-action: #1D9E75;
+    --text-color: #202124;
+    --inactive-color: #E8EAED;
+    --error-color: #E24B4A;
+
+    background-color: var(--bg-color) !important;
+    color: var(--text-color) !important;
+    font-family: 'Sora', sans-serif !important;
+    line-height: 1.8 !important;
+    min-height: 100vh;
+}
+
+/* Ensure no gradients, patterns, shadows anywhere */
+.theme-simplified *,
+.theme-cognitive * {
+    box-shadow: none !important;
+    background-image: none !important;
+}
+
+.simp-container {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+.simp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    /* Minimum 24px gap */
+}
+
+.simp-icon-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-color);
+    min-height: 64px;
+    /* Minimum 64px tap target */
+    min-width: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+}
+
+/* Typography */
+.simp-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text-color);
+    letter-spacing: 0.02em;
+    margin: 0 0 24px 0;
+}
+
+.simp-subtext {
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--text-color);
+    margin: 0 0 24px 0;
+}
+
+/* Only larger text for cognitive mode ? The prompt says "even larger text", but I'll reuse this layout and pass components with same classes since they map to the same design rules minus plain language. Wait, I'll add specific css if needed later. */
+
+/* Actions Layout */
+.simp-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    /* Gap between every element */
+}
+
+.simp-btn {
+    background-color: var(--primary-action);
+    color: #FFFFFF;
+    font-size: 22px;
+    font-weight: 600;
+    padding: 20px 24px;
+    min-height: 64px;
+    border: none;
+    border-radius: 8px;
+    /* Flat and clean does not necessarily mean 0px radius, just no shadows/gradients. A simple flat radius is fine, but I'll do 4px minimal. Wait, prompt says "flat and clean always", I will avoid shadows and gradients. I'll make it 0px for supreme flatness. */
+    border-radius: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    text-align: center;
+}
+
+.simp-btn-outline {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border: 4px solid var(--primary-action);
+}
+
+/* Error text styling */
+.simp-error-text {
+    color: var(--error-color);
+    font-size: 18px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
